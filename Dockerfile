@@ -13,3 +13,4 @@ RUN echo "The Web Server is Running" > /var/www/html/index.html
 EXPOSE 8080 
 CMD ["-D", "FOREGROUND"]
 ENTRYPOINT ["/usr/sbin/httpd"]
+USER 1001:1001  
