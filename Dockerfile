@@ -9,6 +9,7 @@ RUN microdnf install -y httpd python36  rsync findutils procps vim lsof iputils 
 RUN microdnf clean all && [ ! -d /var/cache/yum ] || rm -rf /var/cache/yum
 
 EXPOSE 8080 
-CMD ["-D", "FOREGROUND"]
-ENTRYPOINT ["/usr/sbin/httpd"]
+#CMD ["-D", "FOREGROUND"]
+CMD exec /bin/bash -c "trap : TERM INT; sleep infinity & wait"
+#ENTRYPOINT ["/usr/sbin/httpd"]
 USER 1001:1001  
