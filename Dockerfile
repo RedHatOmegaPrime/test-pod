@@ -12,6 +12,7 @@ RUN microdnf install -y  python36 postgresql10 rsync findutils procps vim lsof i
 #                        python3-jinja2 shadow-utils
 RUN microdnf clean all && [ ! -d /var/cache/yum ] || rm -rf /var/cache/yum
 
+RUN touch /var/www/html/index.html
 RUN echo "The Web Server is Running" > /var/www/html/index.html
 EXPOSE 8080 
 CMD ["-D", "FOREGROUND"]
