@@ -4,7 +4,7 @@ USER root
 RUN microdnf update
 # Useful things IBM recommended plus 2 from Atlassian (fontconfig and jinja2)
 
-RUN microdnf install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+#RUN microdnf install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 RUN microdnf update
 RUN microdnf install -y install postgresql11-server postgresql11  postgresql11-contrib  python36  rsync findutils procps vim lsof iputils openssl curl fontconfig tar unzip 
 RUN microdnf clean all && [ ! -d /var/cache/yum ] || rm -rf /var/cache/yum
