@@ -5,7 +5,7 @@ RUN microdnf update
 # Useful things IBM recommended plus 2 from Atlassian (fontconfig and jinja2)
 
 RUN microdnf update
-RUN microdnf install -y postgresql-server python36  rsync findutils procps vim lsof iputils openssl curl fontconfig tar unzip 
+RUN microdnf install -y postgresql.x86_64  python36  rsync findutils procps vim lsof iputils openssl curl fontconfig tar unzip 
 RUN microdnf clean all && [ ! -d /var/cache/yum ] || rm -rf /var/cache/yum
 
 EXPOSE 8080 
