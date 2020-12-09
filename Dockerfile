@@ -7,7 +7,7 @@ RUN microdnf update
 #RUN microdnf install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 RUN microdnf update
 #RUN microdnf install -y postgresql11-server
-RUN microdnf install -y  python36  rsync findutils procps vim lsof iputils openssl curl fontconfig tar unzip 
+RUN microdnf install -y  wget python36  rsync findutils procps vim lsof iputils openssl curl fontconfig tar unzip 
 RUN microdnf clean all && [ ! -d /var/cache/yum ] || rm -rf /var/cache/yum
 
 RUN wget https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm /
