@@ -10,8 +10,8 @@ RUN microdnf update
 RUN microdnf install -y  wget python36  rsync findutils procps vim lsof iputils openssl curl fontconfig tar unzip 
 RUN microdnf clean all && [ ! -d /var/cache/yum ] || rm -rf /var/cache/yum
 
-RUN microdnf install -y postgresql10-server
-RUN /usr/pgsql-10/bin/postgresql-10-setup initdb
+#RUN microdnf install -y postgresql10-server
+#RUN /usr/pgsql-10/bin/postgresql-10-setup initdb
 
 EXPOSE 8080 
 #CMD ["-D", "FOREGROUND"]
