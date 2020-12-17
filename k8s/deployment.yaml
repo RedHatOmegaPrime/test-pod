@@ -1,6 +1,6 @@
 
 apiVersion: apps/v1
-kind: DeploymentConfig
+kind: Deployment
 metadata:
   labels:
     app: misc-pod
