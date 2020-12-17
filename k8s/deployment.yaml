@@ -1,0 +1,21 @@
+
+apiVersion: apps/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: misc-pod
+  name: misc-pod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: misc-pod
+  template:
+    metadata:
+      labels:
+        app: misc-pod
+    spec:
+      containers:
+        - image: image-registry.openshift-image-registry.svc:5000/rh1-bigmem/misc-pod:latest
+          imagePullPolicy: Always
+          name: misc-pod
