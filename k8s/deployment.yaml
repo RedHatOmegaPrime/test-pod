@@ -15,7 +15,15 @@ spec:
       labels:
         app: misc-pod
     spec:
+      volumes:
+        - name: pvc-jira-home
+          persistentVolumeClaim:
+            claimName: pvc-jira-home
       containers:
         - image: image-registry.openshift-image-registry.svc:5000/rh1-bigmem/misc-pod:latest
           imagePullPolicy: Always
           name: misc-pod
+          volumeMounts:
+            - name: pvc-jira-home
+              mountPath: /jira-home
+
