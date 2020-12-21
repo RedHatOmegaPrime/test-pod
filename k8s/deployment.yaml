@@ -6,7 +6,7 @@ metadata:
     app: misc-pod
   name: misc-pod
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: misc-pod
