@@ -1,21 +1,29 @@
-FROM registry.access.redhat.com/ubi8/ubi-minimal
+FROM centos:centos7
 
-USER root
-RUN microdnf update
-# Useful things IBM recommended plus 2 from Atlassian (fontconfig and jinja2)
+RUN yum -y update; yum clean all
+RUN yum -y install sudo epel-release; yum clean all
+RUN yum -y install postgresql-server postgresql postgresql-contrib supervisor pwgen wget python36  rsync findutils procps vim lsof iputils openssl curl fontconfig tar unzip; yum clean all
 
-#RUN microdnf install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-RUN microdnf update
-RUN microdnf install -y sudo epel-release; yum clean all
-RUN microdnf install -y postgresql postgresql-contrib  pwgen; yum clean all
-RUN microdnf install -y  wget python36  rsync findutils procps vim lsof iputils openssl curl fontconfig tar unzip 
-RUN microdnf clean all && [ ! -d /var/cache/yum ] || rm -rf /var/cache/yum
+ADD ./postgresql-setup /usr/bin/postgresql-setup
+ADD ./supervisord.conf /etc/supervisord.conf
+ADD ./start_postgres.sh /start_postgres.sh
 
-#RUN microdnf install -y postgresql10-server
-#RUN /usr/pgsql-10/bin/postgresql-10-setup initdb
+#Sudo requires a tty. fix that.
+RUN sed -i 's/.*requiretty$/#Defaults requiretty/' /etc/sudoers
+RUN chmod +x /usr/bin/postgresql-setup
+RUN chmod +x /start_postgres.sh
 
-EXPOSE 8080 
-#CMD ["-D", "FOREGROUND"]
+RUN /usr/bin/postgresql-setup initdb
+
+ADD ./postgresql.conf /var/lib/pgsql/data/postgresql.conf
+
+RUN chown -v postgres.postgres /var/lib/pgsql/data/postgresql.conf
+
+RUN echo "host    all             all             0.0.0.0/0               md5" >> /var/lib/pgsql/data/pg_hba.conf
+
+VOLUME ["/var/lib/pgsql"]
+
+EXPOSE 5432
+
+#CMD ["/bin/bash", "/start_postgres.sh"]
 CMD exec /bin/bash -c "trap : TERM INT; sleep infinity & wait"
-#ENTRYPOINT ["/usr/sbin/httpd"]
-USER 1001:1001  
