@@ -1,29 +1,142 @@
-
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
+  creationTimestamp: null
   labels:
-    app: misc-pod
-  name: misc-pod
+    jira-pod-status: active
+  name: jira-sts
 spec:
+  podManagementPolicy: OrderedReady
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: misc-pod
+      app: jira-sts
+  serviceName: jira-sts
   template:
     metadata:
+      creationTimestamp: null
       labels:
-        app: misc-pod
+        app: jira-sts
+        jira-pod-status: active
     spec:
-      volumes:
-        - name: pvc-jira-home
-          persistentVolumeClaim:
-            claimName: pvc-jira-home
       containers:
-        - image: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/misc-pod:latest
-          imagePullPolicy: Always
-          name: misc-pod
-          volumeMounts:
-            - name: pvc-jira-home
-              mountPath: /jira-home
-
+      - env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: ATL_JDBC_URL
+          value: jdbc:postgresql://rh1-stage-additional-resources-rds.cluster-cymiywdgoqls.us-east-1.rds.amazonaws.com:5432/jiradb?targetServerType=master
+        - name: ATL_JDBC_USER
+          value: postgres
+        - name: ATL_DB_DRIVER
+          value: org.postgresql.Driver
+        - name: ATL_DB_TYPE
+          value: postgresaurora96
+        - name: CLUSTERED
+          value: "true"
+        - name: JIRA_SHARED_HOME
+          value: /var/atlassian/application-data/cluster
+        - name: ATL_TOMCAT_PORT
+          value: "8080"
+        - name: atl_tomcat_scheme
+          value: https
+        - name: alt_proxy_port
+          value: "8443"
+        - name: ATL_JDBC_PASSWORD
+          value: $(psql_password)
+        - name: atl_tomcat_maxthreads
+          value: "200"
+        - name: JIRA_HOME
+          value: /var/atlassian/application-data/jira/$(MY_POD_NAME)
+        - name: jira_home
+          value: /var/atlassian/application-data/jira/$(MY_POD_NAME)
+        - name: jira_node_id
+          value: $(MY_POD_NAME)
+        - name: jira_pod_ip
+          value: $(MY_POD_IP)
+        - name: ehcache_listener_hostname
+          value: $(MY_POD_IP)
+        image: quay.io/rh1/jira-sts
+        imagePullPolicy: Always
+        name: jira-sts
+        ports:
+        - containerPort: 8080
+          name: web
+          protocol: TCP
+        resources: 
+          limits:
+            cpu: "12"
+            memory: 48Gi
+          requests:
+            cpu: "12"
+            memory: 30Gi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/atlassian/application-data/jira
+          name: pvc-jira-home
+        - mountPath: /var/atlassian/application-data/cluster
+          name: pvc-jira-shared
+        envFrom:
+          - secretRef:
+              name: psql-creds
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: rh1-osdcluster-pull-secret
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - rm -rf /var/atlassian/application-data/jira/$(MY_POD_NAME) ; mkdir -p /var/atlassian/application-data/jira/$(MY_POD_NAME)
+          ;  /bin/bash /copy-home.sh  ; awk '!/jira.node.id/' /var/atlassian/application-data/jira/$(MY_POD_NAME)/cluster.properties
+          > temp && mv temp /var/atlassian/application-data/jira/$(MY_POD_NAME)/cluster.properties
+          ; awk '!/ehcache.listener.hostName/' /var/atlassian/application-data/jira/$(MY_POD_NAME)/cluster.properties
+          > temp && mv temp /var/atlassian/application-data/jira/$(MY_POD_NAME)/cluster.properties
+          ; echo "jira.node.id=$MY_POD_NAME" >> /var/atlassian/application-data/jira/$(MY_POD_NAME)/cluster.properties
+          ; echo "ehcache.listener.hostName=$MY_POD_IP" >> /var/atlassian/application-data/jira/$(MY_POD_NAME)/cluster.properties
+          ; echo "jira.shared.home=/var/atlassian/application-data/cluster" >> /var/atlassian/application-data/jira/$(MY_POD_NAME)/cluster.properties
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        image: quay.io/rh1/jira-sts
+        imagePullPolicy: Always
+        name: jira-sts-init
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/atlassian/application-data/jira
+          name: pvc-jira-home
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 10
+      imagePullSecrets:
+      - name: rh1-osdcluster-pull-secret
+      volumes:
+      - name: pvc-jira-home
+        persistentVolumeClaim:
+          claimName: pvc-jira-home
+      - name: pvc-jira-shared
+        persistentVolumeClaim:
+          claimName: pvc-jira-shared
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate

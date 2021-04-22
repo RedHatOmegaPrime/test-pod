@@ -1,0 +1,33 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    haproxy.router.openshift.io/timeout: 600s
+  creationTimestamp: null
+  labels:
+    app: jira-sts
+    app.kubernetes.io/component: jira-stsa
+    app.kubernetes.io/instance: jira-sts
+    app.kubernetes.io/part-of: jira-sts
+  name: jira-sts
+spec:
+  port:
+    targetPort: 8080
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: jira-sts
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2020-12-07T07:24:05Z"
+      status: "True"
+      type: Admitted
+    routerCanonicalHostname: apps.rh1-bigmem.p15u.p1.openshiftapps.com
+    routerName: default
+    wildcardPolicy: None
+
