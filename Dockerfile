@@ -2,7 +2,7 @@ FROM centos:centos7
 
 RUN yum -y update; yum clean all
 RUN yum -y install sudo epel-release; yum clean all
-RUN yum -y install postgresql-server postgresql postgresql-contrib supervisor pwgen wget python36  rsync findutils procps vim lsof iputils openssl curl fontconfig tar unzip; yum clean all
+RUN yum -y install postgresql11-server postgresql11 postgresql11-contrib supervisor pwgen wget python36  rsync findutils procps vim lsof iputils openssl curl fontconfig tar unzip; yum clean all
 
 ADD ./postgresql-setup /usr/bin/postgresql-setup
 ADD ./supervisord.conf /etc/supervisord.conf
