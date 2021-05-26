@@ -13,7 +13,7 @@ RUN sed -i 's/.*requiretty$/#Defaults requiretty/' /etc/sudoers
 RUN chmod +x /usr/bin/postgresql-setup
 RUN chmod +x /start_postgres.sh
 
-RUN /usr/bin/postgresql-setup initdb
+RUN /usr/bin/postgresql11-setup initdb
 
 ADD ./postgresql.conf /var/lib/pgsql/data/postgresql.conf
 
