@@ -14,6 +14,7 @@ RUN chmod +x /usr/bin/postgresql-setup
 RUN chmod +x /start_postgres.sh
 
 RUN ls -l /usr/bin/
+RUN ls -l /usr/pgsql-11/bin/
 RUN /usr/bin/postgresql-11-setup initdb
 
 ADD ./postgresql.conf /var/lib/pgsql/data/postgresql.conf
