@@ -1,5 +1,6 @@
 FROM centos:centos7
 
+RUN rpm -Uvh https://yum.postgresql.org/11/redhat/rhel-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 RUN yum -y update; yum clean all
 RUN yum -y install sudo epel-release; yum clean all
 RUN yum -y install postgresql11-server postgresql11 postgresql11-contrib supervisor pwgen wget python36  rsync findutils procps vim lsof iputils openssl curl fontconfig tar unzip; yum clean all
@@ -13,9 +14,7 @@ RUN sed -i 's/.*requiretty$/#Defaults requiretty/' /etc/sudoers
 RUN chmod +x /usr/bin/postgresql-setup
 RUN chmod +x /start_postgres.sh
 
-RUN ls -l /usr/bin/
-RUN ls -l /usr/
-RUN /usr/bin/postgresql-11-setup initdb
+RUN /usr/bin/postgresql-setup initdb
 
 ADD ./postgresql.conf /var/lib/pgsql/data/postgresql.conf
 
