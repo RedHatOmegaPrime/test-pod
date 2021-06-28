@@ -1,6 +1,8 @@
 FROM centos:centos7
 
-RUN rpm -Uvh https://yum.postgresql.org/11/redhat/rhel-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+#RUN rpm -Uvh https://yum.postgresql.org/11/redhat/rhel-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+RUN rpm -Uvh https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+
 RUN yum -y update; yum clean all
 RUN yum -y install sudo epel-release; yum clean all
 RUN yum -y install postgresql11-server postgresql11 postgresql11-contrib supervisor pwgen wget python36  rsync findutils procps vim lsof iputils openssl curl fontconfig tar unzip; yum clean all
